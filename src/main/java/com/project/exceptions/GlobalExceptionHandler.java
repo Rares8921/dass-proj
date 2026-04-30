@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Arrays;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -53,6 +54,18 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception,
                                                                HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.CONFLICT, "Data integrity violation", request.getRequestURI(), List.of());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleException(Exception exception, HttpServletRequest request) {
+        List<String> details = Arrays.stream(exception.getStackTrace())
+                .map(StackTraceElement::toString)
+                .toList();
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                exception.getMessage() == null ? exception.getClass().getName() : exception.getMessage(),
+                request.getRequestURI(),
+                details);
     }
 
     private String formatFieldError(FieldError fieldError) {
