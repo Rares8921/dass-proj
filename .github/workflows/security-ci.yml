@@ -43,17 +43,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Setup Snyk
+        uses: snyk/actions/setup@master
 
-      - name: Install and run Snyk
+      - name: Run Snyk to check for vulnerabilities
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: |
-          npm install -g snyk
-          snyk test --severity-threshold=high
+        run: snyk test --severity-threshold=high
 
   dast:
     runs-on: ubuntu-latest
@@ -62,9 +58,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: auth_system
-          POSTGRES_USER: auth_user
-          POSTGRES_PASSWORD: auth_password
+          POSTGRES_DB: authx
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
         options: >-
@@ -101,7 +97,6 @@ jobs:
           target: 'http://127.0.0.1:8080'
           allow_issue_writing: false
           fail_action: false
-          cmd_options: '-J zap-report.json -w zap-report.md -r zap-report.html'
 
       - name: Upload DAST artifacts
         if: always()
@@ -111,6 +106,6 @@ jobs:
           retention-days: 14
           path: |
             app.log
-            zap-report.json
-            zap-report.md
-            zap-report.html
+            report_json.json
+            report_md.md
+            report_html.html
