@@ -43,13 +43,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Snyk
-        uses: snyk/actions/setup@master
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: Run Snyk to check for vulnerabilities
+      - name: Run Snyk test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: snyk test --severity-threshold=high
+        run: npx snyk test --severity-threshold=high
 
   dast:
     runs-on: ubuntu-latest
@@ -58,9 +60,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: authx
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: auth_system
+          POSTGRES_USER: auth_user
+          POSTGRES_PASSWORD: auth_password
         ports:
           - 5432:5432
         options: >-
