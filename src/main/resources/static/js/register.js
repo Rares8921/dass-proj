@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
+    await window.AuthX.ensureCsrfToken();
     const form = document.getElementById("register-form");
     form.addEventListener("submit", async event => {
         event.preventDefault();

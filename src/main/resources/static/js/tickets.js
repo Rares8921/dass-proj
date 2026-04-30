@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
+    await window.AuthX.ensureCsrfToken();
     const state = {
         tickets: [],
         searchTerm: ""

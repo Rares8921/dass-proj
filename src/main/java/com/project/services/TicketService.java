@@ -6,7 +6,6 @@ import com.project.exceptions.ResourceNotFoundException;
 import com.project.models.Ticket;
 import com.project.models.User;
 import com.project.repository.TicketRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,75 +19,89 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final UserService userService;
-    private final AuditService auditService;
 
     @Transactional
-    public TicketResponse create(TicketRequest request, HttpServletRequest httpRequest) {
-        User currentUser = userService.requireCurrentUser(httpRequest);
-
+    public TicketResponse create(TicketRequest request) {
+        User currentUser = userService.requireCurrentUser();
         Ticket ticket = new Ticket();
-        ticket.setTitle(request.getTitle());
-        ticket.setDescription(request.getDescription());
-        ticket.setSeverity(request.getSeverity());
-        ticket.setStatus(request.getStatus());
+        applyRequest(ticket, request);
         ticket.setOwner(currentUser);
-
-        Ticket savedTicket = ticketRepository.save(ticket);
-        auditService.record(currentUser, "CREATE_TICKET", "ticket", savedTicket.getId().toString(), httpRequest);
-        return toResponse(savedTicket);
+        return toResponse(ticketRepository.save(ticket));
     }
 
-    @Transactional(readOnly = true)
-    public List<TicketResponse> getAll(HttpServletRequest httpRequest) {
-        userService.requireCurrentUser(httpRequest);
-        return ticketRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
+    @Transactional
+    public List<TicketResponse> getAll() {
+        User currentUser = userService.requireCurrentUser();
+        List<Ticket> tickets = userService.isManager(currentUser)
+                ? ticketRepository.findAllByOrderByCreatedAtDesc()
+                : ticketRepository.findAllByOwnerIdOrderByCreatedAtDesc(currentUser.getId());
+        return tickets.stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public TicketResponse getById(UUID id, HttpServletRequest httpRequest) {
-        userService.requireCurrentUser(httpRequest);
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-        return toResponse(ticket);
+    @Transactional
+    public TicketResponse getById(UUID id) {
+        return toResponse(findAccessibleTicket(id, userService.requireCurrentUser()));
     }
 
-    @Transactional(readOnly = true)
-    public List<TicketResponse> search(String term, HttpServletRequest httpRequest) {
-        userService.requireCurrentUser(httpRequest);
+    @Transactional
+    public List<TicketResponse> search(String term) {
+        User currentUser = userService.requireCurrentUser();
         String normalizedTerm = term == null || term.isBlank() ? null : term.trim();
-        return ticketRepository.search(null, normalizedTerm)
+        UUID ownerId = userService.isManager(currentUser) ? null : currentUser.getId();
+        return ticketRepository.search(ownerId, normalizedTerm)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     @Transactional
-    public TicketResponse update(UUID id, TicketRequest request, HttpServletRequest httpRequest) {
-        User currentUser = userService.requireCurrentUser(httpRequest);
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-
-        ticket.setTitle(request.getTitle());
-        ticket.setDescription(request.getDescription());
-        ticket.setSeverity(request.getSeverity());
-        ticket.setStatus(request.getStatus());
-
-        Ticket savedTicket = ticketRepository.save(ticket);
-        auditService.record(currentUser, "UPDATE_TICKET", "ticket", savedTicket.getId().toString(), httpRequest);
-        return toResponse(savedTicket);
+    public TicketResponse update(UUID id, TicketRequest request) {
+        User currentUser = userService.requireCurrentUser();
+        Ticket ticket = findAccessibleTicket(id, currentUser);
+        applyRequest(ticket, request);
+        return toResponse(ticketRepository.save(ticket));
     }
 
     @Transactional
-    public void delete(UUID id, HttpServletRequest httpRequest) {
-        User currentUser = userService.requireCurrentUser(httpRequest);
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+    public void delete(UUID id) {
+        User currentUser = userService.requireCurrentUser();
+        ticketRepository.delete(findAccessibleTicket(id, currentUser));
+    }
 
-        ticketRepository.delete(ticket);
-        auditService.record(currentUser, "DELETE_TICKET", "ticket", id.toString(), httpRequest);
+    private Ticket findAccessibleTicket(UUID id, User currentUser) {
+        if (userService.isManager(currentUser)) {
+            return ticketRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+        }
+        return ticketRepository.findByIdAndOwnerId(id, currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+    }
+
+    private void applyRequest(Ticket ticket, TicketRequest request) {
+        ticket.setTitle(requiredValue(request.getTitle(), "Title is required"));
+        ticket.setDescription(requiredValue(request.getDescription(), "Description is required"));
+        ticket.setSeverity(normalizeSeverity(request.getSeverity()));
+        if (request.getStatus() == null) {
+            throw new IllegalArgumentException("Status is required");
+        }
+        ticket.setStatus(request.getStatus());
+    }
+
+    private String normalizeSeverity(String severity) {
+        String value = requiredValue(severity, "Severity is required").trim().toUpperCase();
+        if (!List.of("LOW", "MEDIUM", "HIGH", "CRITICAL").contains(value)) {
+            throw new IllegalArgumentException("Invalid severity");
+        }
+        return value;
+    }
+
+    private String requiredValue(String value, String message) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(message);
+        }
+        return value.trim();
     }
 
     private TicketResponse toResponse(Ticket ticket) {

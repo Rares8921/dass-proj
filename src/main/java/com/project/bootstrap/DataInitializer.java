@@ -3,9 +3,11 @@ package com.project.bootstrap;
 import com.project.models.User;
 import com.project.models.enums.Role;
 import com.project.repository.UserRepository;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,19 +24,22 @@ public class DataInitializer implements ApplicationRunner {
     private final String analystEmail;
     private final String analystPassword;
     private final String passwordMode;
+    private final ObjectProvider<PasswordEncoder> passwordEncoderProvider;
 
     public DataInitializer(UserRepository userRepository,
                            @Value("${app.bootstrap.manager.email}") String managerEmail,
                            @Value("${app.bootstrap.manager.password}") String managerPassword,
                            @Value("${app.bootstrap.analyst.email}") String analystEmail,
                            @Value("${app.bootstrap.analyst.password}") String analystPassword,
-                           @Value("${app.bootstrap.password-mode:MD5}") String passwordMode) {
+                           @Value("${app.bootstrap.password-mode:MD5}") String passwordMode,
+                           ObjectProvider<PasswordEncoder> passwordEncoderProvider) {
         this.userRepository = userRepository;
         this.managerEmail = managerEmail;
         this.managerPassword = managerPassword;
         this.analystEmail = analystEmail;
         this.analystPassword = analystPassword;
         this.passwordMode = passwordMode;
+        this.passwordEncoderProvider = passwordEncoderProvider;
     }
 
     @Override
@@ -65,7 +70,14 @@ public class DataInitializer implements ApplicationRunner {
         if ("MD5".equals(mode)) {
             return md5(rawPassword);
         }
-        throw new IllegalStateException("Unsupported: " + passwordMode);
+        if ("ARGON2".equals(mode)) {
+            PasswordEncoder passwordEncoder = passwordEncoderProvider.getIfAvailable();
+            if (passwordEncoder == null) {
+                throw new IllegalStateException("PasswordEncoder bean is not available");
+            }
+            return passwordEncoder.encode(rawPassword);
+        }
+        throw new IllegalStateException("Unsupported bootstrap password mode: " + passwordMode);
     }
 
     private String md5(String value) {
@@ -78,7 +90,7 @@ public class DataInitializer implements ApplicationRunner {
             }
             return builder.toString();
         } catch (NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("MD5 is not available", exception);
+            throw new IllegalStateException("MD5 algorithm is not available", exception);
         }
     }
 }

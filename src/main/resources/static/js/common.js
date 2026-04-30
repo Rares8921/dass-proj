@@ -20,13 +20,32 @@ window.AuthX = (() => {
     }
 
     async function ensureCsrfToken(force = false) {
-        return "";
+        if (!force && state.csrfToken) {
+            return state.csrfToken;
+        }
+
+        const response = await fetch("/api/auth/csrf", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                Accept: "application/json"
+            }
+        });
+
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload?.token) {
+            throw new Error("Failed to initialize security token.");
+        }
+
+        state.csrfToken = payload.token;
+        return state.csrfToken;
     }
 
     async function request(url, options = {}, configuration = {}) {
         const method = (options.method || "GET").toUpperCase();
         const headers = {
             Accept: "application/json",
+            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
             ...(options.headers || {})
         };
 
@@ -35,6 +54,10 @@ window.AuthX = (() => {
             body = JSON.stringify(body);
             headers["Content-Type"] = "application/json";
         }
+
+        // if (!["GET", "HEAD", "OPTIONS"].includes(method) && !configuration.skipCsrf) {
+        //     headers["X-XSRF-TOKEN"] = await ensureCsrfToken();
+        // }
 
         const response = await fetch(url, {
             credentials: "include",
@@ -202,6 +225,7 @@ window.AuthX = (() => {
     return {
         state,
         request,
+        ensureCsrfToken,
         initializePage,
         loadSession,
         showFlash,

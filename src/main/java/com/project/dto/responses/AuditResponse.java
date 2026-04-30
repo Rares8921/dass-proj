@@ -1,80 +1,41 @@
 package com.project.dto.responses;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
+@Setter
 public class AuditResponse {
 
     private UUID id;
     private UUID userId;
     private String userEmail;
+    private UUID ticketId;
     private String action;
     private String resource;
     private String resourceId;
     private String ipAddress;
     private Instant createdAt;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
-
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(String resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
+    private String requestMethod;
+    private String requestUri;
+    private String queryString;
+    private String requestHeaders;
+    private String requestCookies;
+    private String requestParameters;
+    private String requestBody;
+    private String requestContentType;
+    private Integer responseStatus;
+    private String responseHeaders;
+    private String responseBody;
+    private String responseContentType;
+    private String requestFlags;
+    private String responseFlags;
+    private String userAgent;
+    private String referer;
+    private Boolean authenticated;
+    private Boolean success;
+    private Long durationMs;
 }

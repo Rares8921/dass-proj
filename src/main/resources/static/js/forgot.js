@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
     await window.AuthX.initializePage();
+    await window.AuthX.ensureCsrfToken();
 
     document.getElementById("forgot-form").addEventListener("submit", async event => {
         event.preventDefault();

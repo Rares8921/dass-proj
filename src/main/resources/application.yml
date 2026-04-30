@@ -1,13 +1,18 @@
 server:
   port: 8080
   error:
-    include-message: always
-    include-binding-errors: always
+    include-message: never
+    include-binding-errors: never
     include-stacktrace: never
 
 spring:
   application:
     name: auth-system
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 1
   datasource:
     url: jdbc:postgresql://localhost:5432/auth_system
     username: auth_user
@@ -15,7 +20,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
@@ -23,6 +28,15 @@ spring:
           time_zone: UTC
   jackson:
     time-zone: UTC
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
   servlet:
     multipart:
       max-file-size: 5MB
@@ -31,12 +45,19 @@ spring:
 app:
   session:
     cookie-name: AUTH_SESSION
-    duration-minutes: 120
+    duration-minutes: 30
     http-only: true
-    secure: false
-    same-site: Lax
+    secure: ${APP_SESSION_SECURE:false}
+    same-site: Strict
+  mail:
+    from: no-reply@authx.local
+  security:
+    max-failed-login-attempts: 5
+    lock-duration-minutes: 15
+    reset-token-duration-minutes: 15
+    reset-link-base-url: http://localhost:8080
   bootstrap:
-    password-mode: MD5
+    password-mode: ARGON2
     manager:
       email: manager@authx.local
       password: Manager123!

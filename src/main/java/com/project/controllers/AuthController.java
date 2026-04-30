@@ -4,11 +4,11 @@ import com.project.dto.requests.LoginRequest;
 import com.project.dto.requests.RegisterRequest;
 import com.project.dto.requests.ResetPasswordRequest;
 import com.project.services.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,38 +26,42 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request,
-                                                        HttpServletRequest httpRequest,
-                                                        HttpServletResponse httpResponse) {
-        return ResponseEntity.ok(authService.register(request, httpRequest, httpResponse));
+                                                        HttpServletResponse response) {
+        return ResponseEntity.ok(authService.register(request, response));
     }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request,
-                                                     HttpServletRequest httpRequest,
-                                                     HttpServletResponse httpResponse) {
-        return ResponseEntity.ok(authService.login(request, httpRequest, httpResponse));
+                                                     HttpServletResponse response) {
+        return ResponseEntity.ok(authService.login(request, response));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Map<String, Object>> me(HttpServletRequest request) {
-        return ResponseEntity.ok(authService.me(request));
+    public ResponseEntity<Map<String, Object>> me() {
+        return ResponseEntity.ok(authService.me());
+    }
+
+    @GetMapping("/csrf")
+    public ResponseEntity<Map<String, String>> csrf(CsrfToken csrfToken) {
+        return ResponseEntity.ok(Map.of(
+                "headerName", csrfToken.getHeaderName(),
+                "parameterName", csrfToken.getParameterName(),
+                "token", csrfToken.getToken()
+        ));
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Map<String, Object>> forgotPassword(@RequestBody ResetPasswordRequest request,
-                                                              HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(authService.forgotPassword(request, httpRequest));
+    public ResponseEntity<Map<String, Object>> forgotPassword(@RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(authService.forgotPassword(request));
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Map<String, Object>> resetPassword(@RequestBody ResetPasswordRequest request,
-                                                             HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(authService.resetPassword(request, httpRequest));
+    public ResponseEntity<Map<String, Object>> resetPassword(@RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(authService.resetPassword(request));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request,
-                                                      HttpServletResponse response) {
-        return ResponseEntity.ok(authService.logout(request, response));
+    public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
+        return ResponseEntity.ok(authService.logout(response));
     }
 }

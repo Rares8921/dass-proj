@@ -3,7 +3,6 @@ package com.project.controllers;
 import com.project.dto.responses.AuditResponse;
 import com.project.services.AuditService;
 import com.project.services.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +20,8 @@ public class AuditController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<AuditResponse>> getAll(HttpServletRequest request) {
-        userService.requireManager(request);
+    public ResponseEntity<List<AuditResponse>> getAll() {
+        userService.requireManager();
         return ResponseEntity.ok(auditService.getAll());
     }
 }

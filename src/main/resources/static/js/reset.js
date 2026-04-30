@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
     await window.AuthX.initializePage();
+    await window.AuthX.ensureCsrfToken();
 
     const tokenInput = document.getElementById("token");
     const urlToken = new URLSearchParams(window.location.search).get("token");

@@ -43,8 +43,12 @@ public class User {
     @Column(nullable = false)
     private int failedLoginAttempts;
 
+    private Instant lockedUntil;
+
     @Column(length = 128)
     private String sessionToken;
+
+    private Instant sessionIssuedAt;
 
     private Instant sessionExpiresAt;
 
@@ -125,6 +129,14 @@ public class User {
         this.failedLoginAttempts = failedLoginAttempts;
     }
 
+    public Instant getLockedUntil() {
+        return lockedUntil;
+    }
+
+    public void setLockedUntil(Instant lockedUntil) {
+        this.lockedUntil = lockedUntil;
+    }
+
     public String getSessionToken() {
         return sessionToken;
     }
@@ -135,6 +147,14 @@ public class User {
 
     public Instant getSessionExpiresAt() {
         return sessionExpiresAt;
+    }
+
+    public Instant getSessionIssuedAt() {
+        return sessionIssuedAt;
+    }
+
+    public void setSessionIssuedAt(Instant sessionIssuedAt) {
+        this.sessionIssuedAt = sessionIssuedAt;
     }
 
     public void setSessionExpiresAt(Instant sessionExpiresAt) {

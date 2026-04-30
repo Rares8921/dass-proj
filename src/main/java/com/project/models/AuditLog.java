@@ -6,16 +6,21 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "audit_logs")
+@Getter
+@Setter
 public class AuditLog {
 
     @Id
@@ -25,6 +30,10 @@ public class AuditLog {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_id", foreignKey = @ForeignKey(name = "fk_audit_logs_ticket"))
+    private Ticket ticket;
 
     @Column(nullable = false, length = 80)
     private String action;
@@ -41,64 +50,61 @@ public class AuditLog {
     @Column(length = 64)
     private String ipAddress;
 
+    @Column(length = 16)
+    private String requestMethod;
+
+    @Column(length = 1024)
+    private String requestUri;
+
+    @Column(columnDefinition = "TEXT")
+    private String queryString;
+
+    @Column(columnDefinition = "TEXT")
+    private String requestHeaders;
+
+    @Column(columnDefinition = "TEXT")
+    private String requestCookies;
+
+    @Column(columnDefinition = "TEXT")
+    private String requestParameters;
+
+    @Column(columnDefinition = "TEXT")
+    private String requestBody;
+
+    @Column(length = 255)
+    private String requestContentType;
+
+    private Integer responseStatus;
+
+    @Column(columnDefinition = "TEXT")
+    private String responseHeaders;
+
+    @Column(columnDefinition = "TEXT")
+    private String responseBody;
+
+    @Column(length = 255)
+    private String responseContentType;
+
+    @Column(columnDefinition = "TEXT")
+    private String requestFlags;
+
+    @Column(columnDefinition = "TEXT")
+    private String responseFlags;
+
+    @Column(length = 1024)
+    private String userAgent;
+
+    @Column(length = 1024)
+    private String referer;
+
+    private Boolean authenticated;
+
+    private Boolean success;
+
+    private Long durationMs;
+
     @PrePersist
     public void onCreate() {
         createdAt = Instant.now();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
-
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(String resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
     }
 }

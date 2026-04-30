@@ -3,7 +3,6 @@ package com.project.controllers;
 import com.project.dto.requests.TicketRequest;
 import com.project.dto.responses.TicketResponse;
 import com.project.services.TicketService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,37 +27,33 @@ public class TicketController {
     private final TicketService ticketService;
 
     @GetMapping
-    public ResponseEntity<List<TicketResponse>> getAll(HttpServletRequest request) {
-        return ResponseEntity.ok(ticketService.getAll(request));
+    public ResponseEntity<List<TicketResponse>> getAll() {
+        return ResponseEntity.ok(ticketService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TicketResponse> getById(@PathVariable UUID id, HttpServletRequest request) {
-        return ResponseEntity.ok(ticketService.getById(id, request));
+    public ResponseEntity<TicketResponse> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(ticketService.getById(id));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<TicketResponse>> search(@RequestParam(required = false) String term,
-                                                       HttpServletRequest request) {
-        return ResponseEntity.ok(ticketService.search(term, request));
+    public ResponseEntity<List<TicketResponse>> search(@RequestParam(required = false) String term) {
+        return ResponseEntity.ok(ticketService.search(term));
     }
 
     @PostMapping
-    public ResponseEntity<TicketResponse> create(@Valid @RequestBody TicketRequest request,
-                                                 HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(ticketService.create(request, httpRequest));
+    public ResponseEntity<TicketResponse> create(@Valid @RequestBody TicketRequest request) {
+        return ResponseEntity.ok(ticketService.create(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TicketResponse> update(@PathVariable UUID id,
-                                                 @Valid @RequestBody TicketRequest request,
-                                                 HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(ticketService.update(id, request, httpRequest));
+    public ResponseEntity<TicketResponse> update(@PathVariable UUID id, @Valid @RequestBody TicketRequest request) {
+        return ResponseEntity.ok(ticketService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id, HttpServletRequest request) {
-        ticketService.delete(id, request);
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        ticketService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
