@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthX | Login</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="page-body">
+<div class="page-shell">
+    <header class="topbar">
+        <a class="brand" href="/index.html">AuthX</a>
+        <nav class="nav-links">
+            <a href="/login.html" class="active">Login</a>
+            <a href="/register.html">Register</a>
+            <a href="/forgot-password.html">Reset</a>
+            <a href="/tickets.html">Tickets</a>
+            <a href="/audit.html">Audit</a>
+        </nav>
+        <div class="topbar-actions">
+            <span id="session-pill" class="session-pill">Guest</span>
+            <button id="logout-button" class="button secondary hidden" type="button">Logout</button>
+        </div>
+    </header>
+
+    <main class="auth-layout">
+        <section class="panel auth-copy-panel">
+            <p class="eyebrow">Authentication</p>
+            <h1>Login</h1>
+            <p class="lead">
+                Sign in to access your dashboard.
+            </p>
+        </section>
+
+        <section class="panel form-panel">
+            <div class="panel-header">
+                <h2>Login</h2>
+            </div>
+            <form id="login-form" class="form-grid">
+                <label>
+                    <span>Email</span>
+                    <input id="email" type="email" autocomplete="username" required>
+                </label>
+                <label>
+                    <span>Password</span>
+                    <input id="password" type="password" autocomplete="current-password" required>
+                </label>
+                <button class="button primary" type="submit">Sign In</button>
+            </form>
+            <div class="inline-links">
+                <a href="/register.html">Create account</a>
+                <a href="/forgot-password.html">Forgot password</a>
+            </div>
+            <section id="flash-banner" class="flash-banner hidden"></section>
+        </section>
+    </main>
+</div>
+<script defer src="/js/common.js"></script>
+<script defer src="/js/login.js"></script>
+</body>
+</html>

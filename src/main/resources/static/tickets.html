@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthX | Tickets</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="page-body">
+<div class="page-shell">
+    <header class="topbar">
+        <a class="brand" href="/index.html">AuthX</a>
+        <nav class="nav-links">
+            <a href="/tickets.html" class="active">Tickets</a>
+            <a href="/audit.html">Audit</a>
+            <a href="/forgot-password.html">Reset</a>
+        </nav>
+        <div class="topbar-actions">
+            <span id="session-pill" class="session-pill">Session</span>
+            <button id="logout-button" class="button secondary" type="button">Logout</button>
+        </div>
+    </header>
+
+    <main class="content-grid">
+        <section class="panel form-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Workspace</p>
+                    <h2>Ticket Editor</h2>
+                </div>
+                <button id="reset-button" class="button secondary" type="button">New Ticket</button>
+            </div>
+            <dl class="summary-list compact-summary">
+                <div>
+                    <dt>Email</dt>
+                    <dd id="session-email">-</dd>
+                </div>
+                <div>
+                    <dt>Role</dt>
+                    <dd id="session-role">-</dd>
+                </div>
+                <div>
+                    <dt>Issued</dt>
+                    <dd id="session-issued-at">-</dd>
+                </div>
+                <div>
+                    <dt>Expires</dt>
+                    <dd id="session-expires-at">-</dd>
+                </div>
+            </dl>
+            <form id="ticket-form" class="form-grid">
+                <input id="ticket-id" type="hidden">
+                <label>
+                    <span>Title</span>
+                    <input id="title" type="text" maxlength="180" required>
+                </label>
+                <label>
+                    <span>Severity</span>
+                    <select id="severity" required>
+                        <option value="LOW">LOW</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="HIGH">HIGH</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                    </select>
+                </label>
+                <label class="full-span">
+                    <span>Description</span>
+                    <textarea id="description" rows="8" maxlength="10000" required></textarea>
+                </label>
+                <label>
+                    <span>Status</span>
+                    <select id="status" required>
+                        <option value="OPEN">OPEN</option>
+                        <option value="IN_PROGRESS">IN_PROGRESS</option>
+                        <option value="RESOLVED">RESOLVED</option>
+                    </select>
+                </label>
+                <button id="submit-button" class="button primary" type="submit">Create Ticket</button>
+            </form>
+            <section id="flash-banner" class="flash-banner hidden"></section>
+        </section>
+
+        <section class="panel list-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Queue</p>
+                    <h2>Tickets</h2>
+                </div>
+                <form id="search-form" class="search-bar">
+                    <input id="search-term" type="search" placeholder="Search title, description or severity">
+                    <button class="button secondary" type="submit">Search</button>
+                </form>
+            </div>
+            <div class="toolbar">
+                <button id="refresh-button" class="button secondary" type="button">Refresh</button>
+                <button id="clear-search-button" class="button secondary" type="button">Clear</button>
+            </div>
+            <div id="tickets-empty" class="empty-panel">
+                <h3>No tickets found</h3>
+                <p>No tickets available.</p>
+            </div>
+            <div id="tickets-list" class="list-stack"></div>
+        </section>
+    </main>
+</div>
+<script defer src="/js/common.js"></script>
+<script defer src="/js/tickets.js"></script>
+</body>
+</html>

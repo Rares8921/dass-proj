@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthX | Audit</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="page-body">
+<div class="page-shell">
+    <header class="topbar">
+        <a class="brand" href="/index.html">AuthX</a>
+        <nav class="nav-links">
+            <a href="/tickets.html">Tickets</a>
+            <a href="/audit.html" class="active">Audit</a>
+            <a href="/forgot-password.html">Reset</a>
+        </nav>
+        <div class="topbar-actions">
+            <span id="session-pill" class="session-pill">Manager</span>
+            <button id="logout-button" class="button secondary" type="button">Logout</button>
+        </div>
+    </header>
+
+    <main class="content-grid content-grid-single">
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Manager View</p>
+                    <h2>Audit Ledger</h2>
+                </div>
+                <button id="refresh-button" class="button secondary" type="button">Refresh</button>
+            </div>
+            <dl class="summary-list compact-summary">
+                <div>
+                    <dt>Email</dt>
+                    <dd id="session-email">-</dd>
+                </div>
+                <div>
+                    <dt>Role</dt>
+                    <dd id="session-role">-</dd>
+                </div>
+                <div>
+                    <dt>Issued</dt>
+                    <dd id="session-issued-at">-</dd>
+                </div>
+                <div>
+                    <dt>Expires</dt>
+                    <dd id="session-expires-at">-</dd>
+                </div>
+            </dl>
+            <section id="flash-banner" class="flash-banner hidden"></section>
+            <div id="audit-empty" class="empty-panel">
+                <h3>No audit records loaded</h3>
+                <p>No records found.</p>
+            </div>
+            <div id="audit-list" class="audit-stack"></div>
+        </section>
+    </main>
+</div>
+<script defer src="/js/common.js"></script>
+<script defer src="/js/audit.js"></script>
+</body>
+</html>

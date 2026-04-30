@@ -1,0 +1,45 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+spring:
+  application:
+    name: auth-system
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_system
+    username: auth_user
+    password: auth_password
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+  jackson:
+    time-zone: UTC
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+app:
+  session:
+    cookie-name: AUTH_SESSION
+    duration-minutes: 120
+    http-only: true
+    secure: false
+    same-site: Lax
+  bootstrap:
+    password-mode: MD5
+    manager:
+      email: manager@authx.local
+      password: Manager123!
+    analyst:
+      email: analyst@authx.local
+      password: Analyst123!
