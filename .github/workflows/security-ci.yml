@@ -50,12 +50,13 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/maven@master
+      - name: Setup Snyk
+        uses: snyk/actions/setup@master
+
+      - name: Run Snyk test
+        run: snyk test --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
 
   dast:
     runs-on: ubuntu-latest
