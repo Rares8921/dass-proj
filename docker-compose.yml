@@ -16,6 +16,13 @@ services:
       timeout: 5s
       retries: 5
 
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: auth-system-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   app:
     build: .
     container_name: auth-system-app
@@ -23,6 +30,8 @@ services:
       - "8080:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/auth_system
+      - SPRING_MAIL_HOST=mailhog
+      - SPRING_MAIL_PORT=1025
     depends_on:
       postgres:
         condition: service_healthy
