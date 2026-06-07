@@ -47,7 +47,7 @@ app:
     cookie-name: AUTH_SESSION
     duration-minutes: 30
     http-only: true
-    secure: ${APP_SESSION_SECURE:false}
+    secure: ${APP_SESSION_SECURE:true}
     same-site: Strict
   mail:
     from: no-reply@authx.local
