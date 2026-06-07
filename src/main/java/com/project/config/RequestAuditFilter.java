@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -33,6 +34,12 @@ import java.util.UUID;
 public class RequestAuditFilter extends OncePerRequestFilter {
 
     private static final int MAX_CAPTURE_LENGTH = 16000;
+    private static final Set<String> SENSITIVE_AUTH_PATHS = Set.of(
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/forgot-password",
+            "/api/auth/reset-password"
+    );
 
     private final AuditService auditService;
     private final UserService userService;
@@ -233,6 +240,9 @@ public class RequestAuditFilter extends OncePerRequestFilter {
     }
 
     private String readRequestBody(CachedBodyHttpServletRequest request) {
+        if (isSensitiveAuthPath(request)) {
+            return "[sensitive auth request body omitted]";
+        }
         String body = request.bodyAsString();
         if (body == null || body.isBlank()) {
             return "";
@@ -247,11 +257,18 @@ public class RequestAuditFilter extends OncePerRequestFilter {
         if (request.getRequestURI().startsWith("/api/audit")) {
             return "[audit response omitted from recursive capture]";
         }
+        if (isSensitiveAuthPath(request)) {
+            return "[sensitive auth response body omitted]";
+        }
         byte[] body = response.getContentAsByteArray();
         if (body.length == 0) {
             return "";
         }
         return new String(body, StandardCharsets.UTF_8);
+    }
+
+    private boolean isSensitiveAuthPath(HttpServletRequest request) {
+        return SENSITIVE_AUTH_PATHS.contains(request.getRequestURI());
     }
 
     private String toJson(Object value) {

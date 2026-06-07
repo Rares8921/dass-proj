@@ -82,7 +82,7 @@ jobs:
         run: |
           mvn -B -DskipTests spring-boot:run -Dspring-boot.run.profiles=test > app.log 2>&1 &
           for attempt in {1..30}; do
-            if curl -fsS http://127.0.0.1:8080 >/dev/null; then
+            if curl -fsS http://127.0.0.1:8080/api/auth/csrf >/dev/null; then
               exit 0
             fi
             sleep 5

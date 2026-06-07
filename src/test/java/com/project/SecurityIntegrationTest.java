@@ -259,9 +259,9 @@ class SecurityIntegrationTest {
     }
 
     @Test
-    void rootResponseIncludesSecurityHeaders() throws Exception {
-        mockMvc.perform(get("/"))
-                .andExpect(status().isOk())
+    void apiResponseIncludesSecurityHeaders() throws Exception {
+        mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isUnauthorized())
                 .andExpect(header().string("Content-Security-Policy", containsString("default-src 'self'")))
                 .andExpect(header().string("Permissions-Policy", containsString("geolocation=()")))
                 .andExpect(header().string("X-Frame-Options", "DENY"))
@@ -377,6 +377,26 @@ class SecurityIntegrationTest {
         assertThat(auditLogRepository.findAll())
                 .extracting("action")
                 .contains("SEARCH_TICKETS", "VIEW_TICKET", "LOGOUT");
+    }
+
+    @Test
+    void authRequestBodiesAreOmittedFromAuditLog() throws Exception {
+        auditLogRepository.deleteAll();
+
+        mockMvc.perform(post("/api/auth/login")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"analyst@authx.local","password":"Analyst123!"}
+                                """))
+                .andExpect(status().isOk());
+
+        assertThat(auditLogRepository.findAll())
+                .filteredOn(log -> "HTTP_REQUEST".equals(log.getAction()))
+                .allSatisfy(log -> {
+                    assertThat(log.getRequestBody()).isEqualTo("[sensitive auth request body omitted]");
+                    assertThat(log.getResponseBody()).isEqualTo("[sensitive auth response body omitted]");
+                });
     }
 
     private void resetSeedUser(String email, String rawPassword, Role role) {
