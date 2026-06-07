@@ -10,6 +10,8 @@ jar="$(reset_cookie_jar enumeration)"
 
 curl_json "01_missing_user_login" "POST" "/api/auth/login" "$jar" \
   '{"email":"missing-user@authx.local","password":"WrongPassword123!"}'
+echo
 
 curl_json "01_existing_user_wrong_password" "POST" "/api/auth/login" "$jar" \
   '{"email":"analyst@authx.local","password":"WrongPassword123!"}'
+echo

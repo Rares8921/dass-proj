@@ -10,3 +10,4 @@ jar="$(reset_cookie_jar session_cookie)"
 
 curl_json "03_login_extract_cookie" "POST" "/api/auth/login" "$jar" \
   '{"email":"analyst@authx.local","password":"Analyst123!"}'
+echo
