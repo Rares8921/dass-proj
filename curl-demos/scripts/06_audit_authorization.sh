@@ -11,10 +11,14 @@ manager_jar="$(reset_cookie_jar audit_manager)"
 
 curl_json "06_login_analyst" "POST" "/api/auth/login" "$analyst_jar" \
   '{"email":"analyst@authx.local","password":"Analyst123!"}'
+echo
 
 curl_json "06_analyst_get_audit" "GET" "/api/audit" "$analyst_jar"
+echo
 
 curl_json "06_login_manager" "POST" "/api/auth/login" "$manager_jar" \
   '{"email":"manager@authx.local","password":"Manager123!"}'
+echo
 
 curl_json "06_manager_get_audit" "GET" "/api/audit" "$manager_jar"
+echo
